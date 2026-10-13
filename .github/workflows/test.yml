@@ -21,5 +21,8 @@ jobs:
               run: |
                   node --check src/app.js
                   node --check src/utils.js
+                  node --check src/tar.js
+                  node --check src/archive-worker.js
+                  node --check src/vendor/zstddec-stream.js
             - name: Run unit tests
               run: npm test
