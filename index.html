@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#0c131e" />
     <meta name="description" content="JSON Tree Viewer" />
     <title>splat-explorer | JSON Tree Viewer</title>
-    <link rel="stylesheet" href="./src/styles.css?v=3" />
-    <script src="./src/app.js?v=3" type="module"></script>
+    <link rel="stylesheet" href="./src/styles.css?v=4" />
+    <script src="./src/app.js?v=4" type="module"></script>
 </head>
 <body>
     <div class="app-shell">
@@ -30,17 +30,17 @@
                     <button type="button" role="tab" class="tab" id="tab-paste" data-tab="paste" aria-selected="false" aria-controls="source-paste">貼り付け</button>
                 </div>
                 <section class="tab-content" id="source-url" role="tabpanel" aria-labelledby="tab-url">
-                    <label class="sr-only" for="json-url">JSONのURL</label>
-                    <input id="json-url" type="url" class="field url-input" spellcheck="false" autocomplete="off" placeholder="JSONのURLを入力" />
+                    <label class="sr-only" for="json-url">JSONまたはTAR.ZSTのURL</label>
+                    <input id="json-url" type="url" class="field url-input" spellcheck="false" autocomplete="off" placeholder="JSON / TAR.ZST のURLを入力" />
                     <button type="button" id="load-url" class="primary-btn">取得</button>
                 </section>
                 <section class="tab-content" id="source-file" role="tabpanel" aria-labelledby="tab-file" hidden>
                     <label class="dropzone" for="json-file" id="dropzone">
+                        <input id="json-file" class="file-picker-input" type="file" aria-label="JSONまたはTAR.ZSTファイルを選択" />
                         <span class="drop-icon" aria-hidden="true">⇧</span>
                         <strong>ファイルを選択</strong>
                         <small>ドラッグ＆ドロップにも対応</small>
                     </label>
-                    <input id="json-file" type="file" accept=".json,.txt,.zst,.tar.zst,application/json,text/plain,application/zstd" hidden />
                 </section>
                 <section class="tab-content" id="source-paste" role="tabpanel" aria-labelledby="tab-paste" hidden>
                     <label class="sr-only" for="json-paste">JSONテキスト</label>
@@ -52,7 +52,7 @@
                         <strong id="archive-title">アーカイブ</strong>
                         <span id="archive-total"></span>
                     </div>
-                    <input id="archive-filter" type="search" class="field" autocomplete="off" placeholder="ファイル名を検索（xrankなど）" aria-label="アーカイブのJSONを検索" />
+                    <input id="archive-filter" type="search" class="field" autocomplete="off" placeholder="ファイル名を検索" aria-label="アーカイブのJSONを検索" />
                     <div id="archive-list" class="archive-list" role="group" aria-label="JSONファイル一覧"></div>
                     <button type="button" id="archive-more" class="toolbar-btn archive-more" hidden>もっと表示</button>
                     <small id="archive-count" class="archive-count"></small>
