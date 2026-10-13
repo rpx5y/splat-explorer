@@ -244,22 +244,31 @@ async function loadUrl() {
     const controller = new AbortController();
     requestController = controller;
     loading(true);
-    status(url.hostname + ' からJSONをGETしています…');
+    status(url.hostname + ' からデータを取得しています…');
     try {
-        const response = await fetch(url.href, { method: 'GET', mode: 'cors', credentials: 'omit', signal: controller.signal });
+        const githubFile = url.hostname === 'github.com'
+            ? url.pathname.match(/^\/([^/]+)\/([^/]+)\/(?:blob|raw)\/([^/]+)\/(.+)$/u)
+            : null;
+        const sourceUrl = githubFile
+            ? `https://raw.githubusercontent.com/${githubFile[1]}/${githubFile[2]}/${githubFile[3]}/${githubFile[4]}`
+            : url.href;
+        const response = await fetch(sourceUrl, { method: 'GET', mode: 'cors', credentials: 'omit', signal: controller.signal });
         if (!response.ok) throw new Error('HTTP ' + response.status);
+        if (/text\/html/iu.test(response.headers.get('content-type') || '')) {
+            throw new Error('HTMLが返されました。JSONまたはTAR.ZSTの直接URLを入力してください。');
+        }
         const buffer = await response.arrayBuffer();
         if (requestController !== controller) return;
         const bytes = new Uint8Array(buffer);
         if (isZstdArchive(bytes, url.pathname)) {
             openArchive(buffer, url.pathname.split('/').pop() || 'archive.tar.zst');
-        } else if (parseContent(new TextDecoder().decode(bytes), url.href)) {
+        } else if (parseContent(new TextDecoder().decode(bytes), sourceUrl)) {
             notify('JSONを取得しました');
         }
     } catch (error) {
         if (error.name !== 'AbortError') {
             status(error instanceof TypeError
-                ? 'CORSまたは通信エラーです。取得元がブラウザGETを許可していない場合は、JSONを保存してファイルとして開いてください。'
+                ? 'URLから取得できませんでした。配信元のCORS制限か通信エラーです。URLをブラウザで開いて保存し、「ファイル」から選択してください。'
                 : 'URL取得に失敗: ' + error.message, true);
         }
     } finally {
@@ -564,7 +573,11 @@ function boot() {
     $('json-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); loadUrl(); } });
     $('load-paste').addEventListener('click', () => parseContent($('json-paste').value, '貼り付けJSON'));
     $('json-paste').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); parseContent($('json-paste').value, '貼り付けJSON'); } });
-    $('json-file').addEventListener('change', e => loadFile(e.target.files?.[0]));
+    $('json-file').addEventListener('change', e => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        loadFile(file);
+    });
     const zone = $('dropzone');
     for (const type of ['dragenter', 'dragover']) zone.addEventListener(type, e => { e.preventDefault(); zone.classList.add('dragging'); });
     for (const type of ['dragleave', 'drop']) zone.addEventListener(type, e => { e.preventDefault(); zone.classList.remove('dragging'); });
