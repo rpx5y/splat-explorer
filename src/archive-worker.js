@@ -49,7 +49,7 @@ async function readEntry(index, id) {
     let copied = 0;
     let lastReport = 0;
     // Read only the selected JSON into memory. Streaming keeps the other ~400 MB out of JS.
-    // Complete the generator to let the WASM decoder free its temporary buffers.
+    // Stopping the iterator releases WASM buffers in the decoder's finally blocks.
     for (const chunk of decoder.decodeStreaming(inputChunks(compressed))) {
         const chunkEnd = position + chunk.length;
         const start = Math.max(position, entry.offset);
@@ -63,6 +63,7 @@ async function readEntry(index, id) {
             lastReport = position;
             self.postMessage({ op: 'reading', id, progress: Math.min(100, Math.round(position / end * 100)) });
         }
+        if (copied === entry.size) break;
     }
     if (copied !== entry.size) throw new Error('JSONが途中で終了しました');
     self.postMessage({ op: 'file', id, index, buffer: output.buffer }, [output.buffer]);
