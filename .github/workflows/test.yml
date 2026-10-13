@@ -1,0 +1,25 @@
+name: Validate JSON viewer
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+            - name: Check JavaScript syntax
+              run: |
+                  node --check src/app.js
+                  node --check src/utils.js
+            - name: Run unit tests
+              run: npm test

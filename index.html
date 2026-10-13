@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c131e" />
+    <meta name="description" content="JSON Tree Viewer" />
+    <title>splat-explorer | JSON Tree Viewer</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script src="./src/app.js" type="module"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <a href="./" class="brand" aria-label="splat-explorer">
+                <span class="brand-mark" aria-hidden="true">{ }</span>
+                <span>splat-explorer</span>
+            </a>
+            <span class="header-title">JSON Tree Viewer</span>
+        </header>
+        <main class="workspace">
+            <aside class="panel source-panel" aria-labelledby="source-heading">
+                <div class="panel-heading">
+                    <h1 id="source-heading">読み込み</h1>
+                    <button type="button" id="clear-data" class="text-btn" title="現在のデータを消去">クリア</button>
+                </div>
+                <div class="tabs" role="tablist" aria-label="入力方法">
+                    <button type="button" role="tab" class="tab is-active" id="tab-url" data-tab="url" aria-selected="true" aria-controls="source-url">URL</button>
+                    <button type="button" role="tab" class="tab" id="tab-file" data-tab="file" aria-selected="false" aria-controls="source-file">ファイル</button>
+                    <button type="button" role="tab" class="tab" id="tab-paste" data-tab="paste" aria-selected="false" aria-controls="source-paste">貼り付け</button>
+                </div>
+                <section class="tab-content" id="source-url" role="tabpanel" aria-labelledby="tab-url">
+                    <label class="sr-only" for="json-url">JSONのURL</label>
+                    <input id="json-url" type="url" class="field url-input" spellcheck="false" autocomplete="off" placeholder="JSONのURLを入力" />
+                    <button type="button" id="load-url" class="primary-btn">取得</button>
+                </section>
+                <section class="tab-content" id="source-file" role="tabpanel" aria-labelledby="tab-file" hidden>
+                    <label class="dropzone" for="json-file" id="dropzone">
+                        <span class="drop-icon" aria-hidden="true">⇧</span>
+                        <strong>ファイルを選択</strong>
+                        <small>ドラッグ＆ドロップにも対応</small>
+                    </label>
+                    <input id="json-file" type="file" accept=".json,.txt,application/json,text/plain" hidden />
+                </section>
+                <section class="tab-content" id="source-paste" role="tabpanel" aria-labelledby="tab-paste" hidden>
+                    <label class="sr-only" for="json-paste">JSONテキスト</label>
+                    <textarea id="json-paste" class="field paste-input" rows="10" spellcheck="false" placeholder="JSONを貼り付け"></textarea>
+                    <button type="button" id="load-paste" class="primary-btn">表示</button>
+                </section>
+                <p class="status-line" id="notice" role="status" aria-live="polite"></p>
+            </aside>
+            <section class="panel viewer-panel" aria-labelledby="viewer-heading">
+                <div class="viewer-top">
+                    <h2 id="viewer-heading">JSONツリー</h2>
+                    <span id="loaded-status" class="loaded-status">未読み込み</span>
+                </div>
+                <div class="viewer-tools">
+                    <div class="search-box">
+                        <span class="search-icon" aria-hidden="true">⌕</span>
+                        <input id="search-input" type="search" placeholder="キー・値・IDを検索" aria-label="JSONを検索" autocomplete="off" disabled />
+                        <kbd>/</kbd>
+                    </div>
+                    <span class="search-count" id="search-count" aria-live="polite"></span>
+                    <button type="button" id="search-prev" class="square-btn" aria-label="前の検索結果" title="前の検索結果" disabled>↑</button>
+                    <button type="button" id="search-next" class="square-btn" aria-label="次の検索結果" title="次の検索結果" disabled>↓</button>
+                </div>
+                <div class="toolbar">
+                    <button type="button" id="expand-all" class="toolbar-btn" disabled>展開</button>
+                    <button type="button" id="collapse-all" class="toolbar-btn" disabled>折りたたむ</button>
+                    <span class="toolbar-separator"></span>
+                    <label class="toggle"><input type="checkbox" id="decode-ids" checked /><span>IDデコード</span></label>
+                    <label class="toggle"><input type="checkbox" id="repair-text" checked /><span>文字化け補正</span></label>
+                    <div class="toolbar-spacer"></div>
+                    <button type="button" id="copy-json" class="toolbar-btn" disabled title="元のJSONをコピー">コピー</button>
+                    <button type="button" id="download-json" class="toolbar-btn" disabled title="JSONをファイルに保存">保存 ↓</button>
+                </div>
+                <div class="info-strip">
+                    <span id="document-name" title="データ名">未読み込み</span>
+                    <span id="document-size">—</span>
+                </div>
+                <div class="tree-container" id="tree-container" tabindex="0" aria-label="JSONツリー">
+                    <div class="empty-state" id="empty-state">JSONを読み込んでください</div>
+                    <div id="tree-root" class="tree-root" hidden></div>
+                </div>
+                <div class="viewer-bottom">
+                    <span id="summary">—</span>
+                    <span id="path-display" title="選択中のJSONPath">$</span>
+                    <button type="button" id="copy-path" class="footer-copy" disabled>パスをコピー</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
