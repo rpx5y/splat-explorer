@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#0c131e" />
     <meta name="description" content="JSON Tree Viewer" />
     <title>splat-explorer | JSON Tree Viewer</title>
-    <link rel="stylesheet" href="./src/styles.css?v=2" />
-    <script src="./src/app.js?v=2" type="module"></script>
+    <link rel="stylesheet" href="./src/styles.css?v=3" />
+    <script src="./src/app.js?v=3" type="module"></script>
 </head>
 <body>
     <div class="app-shell">
@@ -40,12 +40,22 @@
                         <strong>ファイルを選択</strong>
                         <small>ドラッグ＆ドロップにも対応</small>
                     </label>
-                    <input id="json-file" type="file" accept=".json,.txt,application/json,text/plain" hidden />
+                    <input id="json-file" type="file" accept=".json,.txt,.zst,.tar.zst,application/json,text/plain,application/zstd" hidden />
                 </section>
                 <section class="tab-content" id="source-paste" role="tabpanel" aria-labelledby="tab-paste" hidden>
                     <label class="sr-only" for="json-paste">JSONテキスト</label>
                     <textarea id="json-paste" class="field paste-input" rows="10" spellcheck="false" placeholder="JSONを貼り付け"></textarea>
                     <button type="button" id="load-paste" class="primary-btn">表示</button>
+                </section>
+                <section id="archive-browser" class="archive-browser" hidden aria-label="アーカイブ内JSON">
+                    <div class="archive-heading">
+                        <strong id="archive-title">アーカイブ</strong>
+                        <span id="archive-total"></span>
+                    </div>
+                    <input id="archive-filter" type="search" class="field" autocomplete="off" placeholder="ファイル名を検索（xrankなど）" aria-label="アーカイブのJSONを検索" />
+                    <div id="archive-list" class="archive-list" role="group" aria-label="JSONファイル一覧"></div>
+                    <button type="button" id="archive-more" class="toolbar-btn archive-more" hidden>もっと表示</button>
+                    <small id="archive-count" class="archive-count"></small>
                 </section>
                 <p class="status-line" id="notice" role="status" aria-live="polite"></p>
             </aside>
