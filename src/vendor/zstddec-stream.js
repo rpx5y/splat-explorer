@@ -129,9 +129,11 @@ export class ZSTDDecoder {
 		const outputPtr = instance.exports.malloc(sizeOfPointer + sizeOfSizeT * 2);
 		let lastRet = 0;
 
+		try {
 		for (const array of arrays) {
 			const compressedPtr = instance.exports.malloc(array.byteLength);
 			heap.set(array, compressedPtr);
+			try {
 
 			// set input struct fields: src, size, pos
 			heapView.setInt32(inputPtr, compressedPtr, true);
@@ -154,17 +156,19 @@ export class ZSTDDecoder {
 				const outputPos = heapView.getUint32(outputPtr + sizeOfPointer + sizeOfSizeT, true);
 				yield heap.slice(buffOut, buffOut + outputPos);
 			}
-			instance.exports.free(compressedPtr);
+			} finally {
+				instance.exports.free(compressedPtr);
+			}
 		}
-
+		if (lastRet !== 0) {
+			throw new Error('Incomplete stream, more data expected.');
+		}
+		} finally {
 		instance.exports.ZSTD_freeDCtx(dctxPtr);
 		instance.exports.free(buffIn);
 		instance.exports.free(buffOut);
 		instance.exports.free(inputPtr);
 		instance.exports.free(outputPtr);
-
-		if (lastRet !== 0) {
-			throw new Error('Incomplete stream, more data expected.');
 		}
 	}
 }
