@@ -105,6 +105,20 @@ kbd { font: 11px var(--mono); padding: 1px 4px; color: var(--muted); border: 1px
 .toast { position: fixed; z-index: 10; right: 20px; bottom: 20px; padding: 10px 14px; background: #25483f; border: 1px solid #43967b; color: #ecfff7; border-radius: 8px; font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity .16s, transform .16s; box-shadow: 0 10px 35px #0005; max-width: min(420px, calc(100vw - 32px)); }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #5d3037; border-color: #a46169; }
+
+.archive-browser { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--panel-border); }
+.archive-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.archive-heading strong { font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.archive-heading span { font: 11px var(--mono); color: var(--muted); white-space: nowrap; }
+.archive-list { display: flex; flex-direction: column; gap: 4px; max-height: min(50vh, 470px); overflow-y: auto; padding: 8px 2px; margin-top: 8px; scrollbar-color: #445a71 #141e2c; }
+.archive-file { background: none; color: var(--text); border: 1px solid transparent; border-radius: 6px; width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 3px; padding: 8px; text-align: left; }
+.archive-file:hover { background: #233348; }
+.archive-file.is-active { background: #19423c; border-color: #4b977f; }
+.archive-file-name { overflow-wrap: anywhere; font: 11px/1.5 var(--mono); }
+.archive-file-size { font: 10px var(--mono); color: var(--muted); }
+.archive-more { width: 100%; }
+.archive-count { display: block; text-align: center; color: var(--muted); margin-top: 7px; font-size: 11px; }
+
 @media (max-width: 920px) {
     .app-shell { padding: 0 12px 12px; }
     .workspace { grid-template-columns: minmax(0, 1fr); }
