@@ -400,6 +400,8 @@ function setupTabs() {
 
 function boot() {
     setupTabs();
+    // Clear browser-restored URL form state; never prefill a sample endpoint.
+    $('json-url').value = '';
     $('load-url').addEventListener('click', loadUrl);
     $('json-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); loadUrl(); } });
     $('load-paste').addEventListener('click', () => parseContent($('json-paste').value, '貼り付けJSON'));
