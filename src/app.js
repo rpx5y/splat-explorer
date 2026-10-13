@@ -11,6 +11,17 @@ let activeMatch = -1;
 let searchTimer = null;
 let toastTimer = null;
 let requestController = null;
+const ARCHIVE_BATCH = 100;
+const ARCHIVE_CACHE_LIMIT = 5;
+let archiveWorker = null;
+let archiveEntries = [];
+let archiveFiltered = [];
+let archiveName = '';
+let archiveShown = 0;
+let archiveRequest = 0;
+let archiveSelectedRequest = 0;
+let archiveActiveIndex = -1;
+const archiveCache = new Map();
 
 function notify(message, error = false) {
     const toast = $('toast');
@@ -38,7 +49,9 @@ function bytesLabel(size) {
 
 function parseContent(content, source) {
     try {
-        loadData(JSON.parse(content.replace(/^\ufeff/u, '')), source, new Blob([content]).size);
+        const json = JSON.parse(content.replace(/^\ufeff/u, ''));
+        closeArchive();
+        loadData(json, source, new Blob([content]).size);
         return true;
     } catch (error) {
         status('JSONの解析に失敗: ' + error.message, true);
@@ -68,6 +81,7 @@ function loadData(json, name = 'Untitled JSON', size) {
 }
 
 function clearData() {
+    closeArchive();
     requestController?.abort();
     requestController = null;
     data = null;
@@ -89,6 +103,133 @@ function clearData() {
     for (const id of ['search-input', 'expand-all', 'collapse-all', 'copy-json', 'download-json', 'copy-path', 'search-prev', 'search-next']) $(id).disabled = true;
 }
 
+
+function closeArchive() {
+    archiveWorker?.terminate();
+    archiveWorker = null;
+    archiveEntries = [];
+    archiveFiltered = [];
+    archiveName = '';
+    archiveShown = 0;
+    archiveActiveIndex = -1;
+    archiveSelectedRequest = 0;
+    archiveCache.clear();
+    $('archive-browser').hidden = true;
+    $('archive-list').replaceChildren();
+    $('archive-filter').value = '';
+    $('archive-more').hidden = true;
+}
+
+function renderArchiveList(reset = true) {
+    if (reset) {
+        archiveShown = 0;
+        $('archive-list').replaceChildren();
+        const query = $('archive-filter').value.trim().toLocaleLowerCase();
+        archiveFiltered = archiveEntries
+            .map((entry, index) => ({ ...entry, index }))
+            .filter((entry) => entry.path.toLocaleLowerCase().includes(query));
+    }
+    const items = archiveFiltered.slice(archiveShown, archiveShown + ARCHIVE_BATCH);
+    const fragment = document.createDocumentFragment();
+    for (const entry of items) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'archive-file' + (entry.index === archiveActiveIndex ? ' is-active' : '');
+        button.dataset.index = String(entry.index);
+        button.title = entry.path;
+        const fileName = document.createElement('span');
+        fileName.className = 'archive-file-name';
+        fileName.textContent = entry.path;
+        const fileSize = document.createElement('span');
+        fileSize.className = 'archive-file-size';
+        fileSize.textContent = bytesLabel(entry.size);
+        button.append(fileName, fileSize);
+        button.addEventListener('click', () => selectArchiveEntry(entry.index));
+        fragment.append(button);
+    }
+    $('archive-list').append(fragment);
+    archiveShown += items.length;
+    $('archive-more').hidden = archiveShown >= archiveFiltered.length;
+    $('archive-count').textContent = archiveFiltered.length + '件中 ' + archiveShown + '件表示';
+}
+
+function markArchiveSelection(index) {
+    archiveActiveIndex = index;
+    for (const button of $('archive-list').querySelectorAll('.archive-file')) {
+        button.classList.toggle('is-active', Number(button.dataset.index) === index);
+    }
+}
+
+function selectArchiveEntry(index) {
+    if (!archiveWorker || !archiveEntries[index]) return;
+    markArchiveSelection(index);
+    const entry = archiveEntries[index];
+    const cached = archiveCache.get(index);
+    if (cached) {
+        archiveCache.delete(index);
+        archiveCache.set(index, cached);
+        ++archiveSelectedRequest;
+        loadData(cached, entry.path, entry.size);
+        return;
+    }
+    const id = ++archiveRequest;
+    archiveSelectedRequest = id;
+    status(entry.path + ' を展開中…');
+    archiveWorker.postMessage({ op: 'read', id, index });
+}
+
+function openArchive(buffer, name) {
+    clearData();
+    archiveName = name;
+    const worker = new Worker(new URL('./archive-worker.js', import.meta.url), { type: 'module' });
+    archiveWorker = worker;
+    const openId = ++archiveRequest;
+    status(name + ' を展開してファイル一覧を作成しています…');
+    worker.onmessage = (event) => {
+        if (archiveWorker !== worker) return;
+        const message = event.data;
+        if (message.op === 'progress') {
+            status(name + ' を展開中… ' + message.count + '件のJSONを検出');
+            return;
+        }
+        if (message.op === 'opened') {
+            archiveEntries = message.entries;
+            $('archive-title').textContent = name;
+            $('archive-total').textContent = archiveEntries.length + '件';
+            $('archive-browser').hidden = false;
+            renderArchiveList();
+            status('JSON ' + archiveEntries.length + '件を読み込みました。ファイルを選択してください。');
+            return;
+        }
+        if (message.op === 'reading') {
+            if (message.id === archiveSelectedRequest) status('JSONを展開中… ' + message.progress + '%');
+            return;
+        }
+        if (message.op === 'error') {
+            if (message.id === archiveSelectedRequest || message.id === openId) status('アーカイブ処理に失敗: ' + message.message, true);
+            return;
+        }
+        if (message.op !== 'file' || message.id !== archiveSelectedRequest) return;
+        const entry = archiveEntries[message.index];
+        if (!entry) return;
+        try {
+            const content = new TextDecoder('utf-8', { fatal: true }).decode(message.buffer);
+            const json = JSON.parse(content.replace(/^\ufeff/u, ''));
+            archiveCache.set(message.index, json);
+            while (archiveCache.size > ARCHIVE_CACHE_LIMIT) archiveCache.delete(archiveCache.keys().next().value);
+            loadData(json, entry.path, entry.size);
+            notify(entry.path + ' を開きました');
+        } catch (error) {
+            status('JSONの解析に失敗: ' + error.message, true);
+        }
+    };
+    worker.onerror = (event) => {
+        if (archiveWorker !== worker) return;
+        status('アーカイブ処理を開始できませんでした: ' + (event.message || 'Workerエラー'), true);
+    };
+    worker.postMessage({ op: 'open', id: openId, buffer }, [buffer]);
+}
+
 async function loadUrl() {
     const input = $('json-url').value.trim();
     let url;
@@ -107,9 +248,14 @@ async function loadUrl() {
     try {
         const response = await fetch(url.href, { method: 'GET', mode: 'cors', credentials: 'omit', signal: controller.signal });
         if (!response.ok) throw new Error('HTTP ' + response.status);
-        const content = await response.text();
+        const buffer = await response.arrayBuffer();
         if (requestController !== controller) return;
-        if (parseContent(content, url.href)) notify('JSONを取得しました');
+        const bytes = new Uint8Array(buffer);
+        if (isZstdArchive(bytes, url.pathname)) {
+            openArchive(buffer, url.pathname.split('/').pop() || 'archive.tar.zst');
+        } else if (parseContent(new TextDecoder().decode(bytes), url.href)) {
+            notify('JSONを取得しました');
+        }
     } catch (error) {
         if (error.name !== 'AbortError') {
             status(error instanceof TypeError
@@ -122,10 +268,20 @@ async function loadUrl() {
     }
 }
 
+function isZstdArchive(bytes, name) {
+    return /\.zst$/iu.test(name) || (
+        bytes.length >= 4 && bytes[0] === 0x28 && bytes[1] === 0xb5 && bytes[2] === 0x2f && bytes[3] === 0xfd
+    );
+}
+
 async function loadFile(file) {
     if (!file) return;
     try {
-        if (parseContent(await file.text(), file.name)) notify(file.name + ' を読み込みました');
+        if (isZstdArchive(new Uint8Array(await file.slice(0, 4).arrayBuffer()), file.name)) {
+            openArchive(await file.arrayBuffer(), file.name);
+        } else if (parseContent(await file.text(), file.name)) {
+            notify(file.name + ' を読み込みました');
+        }
     } catch (error) {
         status('ファイル読込エラー: ' + error.message, true);
     }
@@ -400,6 +556,8 @@ function setupTabs() {
 
 function boot() {
     setupTabs();
+    $('archive-filter').addEventListener('input', () => renderArchiveList());
+    $('archive-more').addEventListener('click', () => renderArchiveList(false));
     // Clear browser-restored URL form state; never prefill a sample endpoint.
     $('json-url').value = '';
     $('load-url').addEventListener('click', loadUrl);
