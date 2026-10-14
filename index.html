@@ -7,7 +7,9 @@
     <meta name="description" content="JSON Tree Viewer" />
     <title>splat-explorer | JSON Tree Viewer</title>
     <link rel="stylesheet" href="./src/styles.css?v=4" />
+    <link rel="stylesheet" href="./src/xrank.css?v=1" />
     <script src="./src/app.js?v=4" type="module"></script>
+    <script src="./src/xrank.js?v=1" type="module"></script>
     <!-- Cloudflare Web Analytics -->
     <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c9f3e94383e74afa9334ca9432b1044f"}'></script>
     <!-- End Cloudflare Web Analytics -->
@@ -102,6 +104,47 @@
                 </div>
             </section>
         </main>
+
+        <section class="xrank" id="xrank" aria-labelledby="xrank-heading">
+            <div class="xrank-title-row"><h2 id="xrank-heading">Xランキング</h2></div>
+            <div class="xrank-search xrank-surface">
+                <label class="sr-only" for="xrank-query">プレイヤー検索</label>
+                <div class="xrank-search-line"><span aria-hidden="true" class="xrank-search-symbol">⌕</span><input id="xrank-query" type="search" autocomplete="off" spellcheck="false" placeholder="名前・#番号・プレイヤーID" /></div>
+                <div id="xrank-status" class="xrank-status" role="status" aria-live="polite"></div>
+                <div id="xrank-search-results" class="xrank-search-results" hidden></div>
+                <button type="button" id="xrank-more-results" class="xrank-more" hidden>もっと表示</button>
+            </div>
+            <div id="xrank-player" class="xrank-surface xrank-player" hidden>
+                <header class="xrank-player-head">
+                    <div class="xrank-player-title"><h3 id="xrank-player-name"></h3><div class="xrank-player-id" id="xrank-player-id"></div></div>
+                    <button type="button" class="xrank-copy" id="xrank-copy-id">IDをコピー</button>
+                </header>
+                <div class="xrank-names-block">
+                    <div class="xrank-subtitle">名前</div>
+                    <div id="xrank-names" class="xrank-names" aria-label="記録された名前"></div>
+                    <div id="xrank-name-detail" class="xrank-name-detail" hidden></div>
+                </div>
+                <div class="xrank-ranking-head">
+                    <h3>ランキング</h3>
+                    <div class="xrank-filters">
+                        <label class="sr-only" for="xrank-region">リージョン</label>
+                        <select id="xrank-region"><option value="">全リージョン</option><option value="p">ヤコ</option><option value="a">アロメ</option></select>
+                        <label class="sr-only" for="xrank-rule">ルール</label>
+                        <select id="xrank-rule"><option value="">全ルール</option><option value="ar">エリア</option><option value="lf">ヤグラ</option><option value="gl">ホコ</option><option value="cl">アサリ</option></select>
+                        <label class="sr-only" for="xrank-sort">並び順</label>
+                        <select id="xrank-sort"><option value="season">新しい順</option><option value="rank">順位順</option><option value="power">XP順</option></select>
+                    </div>
+                </div>
+                <div class="xrank-table-wrap">
+                    <table class="xrank-table">
+                        <thead><tr><th>シーズン</th><th>リージョン</th><th>ルール</th><th>順位</th><th>XP</th><th>ブキ</th></tr></thead>
+                        <tbody id="xrank-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="xrank-cards" id="xrank-cards"></div>
+                <button type="button" id="xrank-more-records" class="xrank-more" hidden>もっと表示</button>
+            </div>
+        </section>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>

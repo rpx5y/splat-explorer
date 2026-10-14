@@ -1,0 +1,168 @@
+.xrank {
+    max-width: 1300px;
+    margin: 60px auto 90px;
+    color: var(--text, #eaf0f8);
+}
+.xrank-title-row {
+    margin: 0 0 18px;
+}
+.xrank-title-row h2 {
+    font-size: 24px;
+    letter-spacing: -.035em;
+}
+.xrank-surface {
+    background: var(--panel, #141e2c);
+    border: 1px solid var(--panel-border, #29384c);
+    border-radius: 12px;
+    padding: 24px;
+}
+.xrank-search-line {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid #3b5364;
+    background: #0d1724;
+    border-radius: 9px;
+    padding: 0 14px;
+}
+.xrank-search-line:focus-within { border-color: var(--accent, #6ce3bd); }
+.xrank-search-symbol { color: var(--accent, #6ce3bd); font-size: 24px; }
+.xrank-search-line input {
+    width: 100%;
+    height: 52px;
+    border: 0;
+    outline: none;
+    color: inherit;
+    background: transparent;
+    font-size: 16px;
+    min-width: 0;
+}
+.xrank-search-line input::placeholder { color: #879ab0; }
+.xrank-status:empty { display: none; }
+.xrank-status { margin: 13px 0 0; font-size: 12px; color: #9aadbf; }
+.xrank-search-results {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.xrank-result {
+    display: flex;
+    min-width: 0;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 15px;
+    color: inherit;
+    background: #182637;
+    border: 1px solid #2e4256;
+    border-radius: 9px;
+    text-align: left;
+}
+.xrank-result:hover, .xrank-result[aria-current="true"] { border-color: #64cda8; background: #1c343d; }
+.xrank-result-main { min-width: 0; }
+.xrank-result-name { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.xrank-result-id { display: block; color: #96adc2; font-size: 11px; overflow-wrap: anywhere; margin-top: 3px; }
+.xrank-result-arrow { font-size: 20px; color: #77dbb9; }
+.xrank-empty { color: #9aadbf; font-size: 13px; padding: 10px 0; }
+.xrank-more {
+    display: block;
+    width: fit-content;
+    margin: 16px auto 0;
+    border-radius: 8px;
+    border: 1px solid #42586b;
+    padding: 9px 22px;
+    background: #1a2b3d;
+    color: inherit;
+    font-weight: 600;
+}
+.xrank-more:hover { border-color: #6ce3bd; }
+.xrank-player { margin-top: 28px; }
+.xrank-player-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.xrank-player-head h3 { font-size: 21px; margin: 0 0 6px; overflow-wrap: anywhere; }
+.xrank-player-id { font: 12px/1.7 var(--mono, monospace); color: #96adc2; overflow-wrap: anywhere; }
+.xrank-copy { background: #1d3640; border: 1px solid #355e64; color: #9be8d1; padding: 8px 13px; border-radius: 8px; white-space: nowrap; }
+.xrank-names-block { margin: 25px 0 28px; }
+.xrank-subtitle { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #aebfd0; }
+.xrank-names {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding: 2px 0 11px;
+}
+.xrank-name-button {
+    flex: none;
+    background: #1c2c40;
+    color: #eaf0f8;
+    border: 1px solid #35495d;
+    padding: 8px 11px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    max-width: 320px;
+    overflow-wrap: anywhere;
+}
+.xrank-name-button:hover, .xrank-name-button[aria-expanded="true"] { border-color: #6ce3bd; background: #1e3a3e; }
+.xrank-name-detail {
+    margin: 6px 0 0;
+    padding: 13px 15px;
+    background: #101c2b;
+    border: 1px solid #2e4357;
+    border-radius: 9px;
+}
+.xrank-name-detail-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; overflow-wrap: anywhere; }
+.xrank-name-seasons { display: flex; flex-wrap: wrap; gap: 7px; }
+.xrank-season-chip { display: inline-flex; gap: 6px; align-items: center; border: 1px solid #32475a; background: #1b2c3c; border-radius: 6px; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
+.xrank-season-code { color: #8eabbc; font-size: 11px; }
+.xrank-season-label { font-weight: 750; }
+.xrank-winter { color: #a9bfff; }
+.xrank-spring { color: #f3a0c6; }
+.xrank-summer { color: #84d9eb; }
+.xrank-autumn { color: #e9b56d; }
+.xrank-ranking-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; }
+.xrank-ranking-head h3 { margin: 0; font-size: 17px; }
+.xrank-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.xrank-filters select { border: 1px solid #3b5266; color: inherit; background: #101c2b; padding: 9px 11px; border-radius: 8px; font-size: 13px; }
+.xrank-table-wrap { border: 1px solid #2a4155; border-radius: 9px; overflow-x: auto; }
+.xrank-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.xrank-table th { color: #aabed0; font-size: 12px; font-weight: 600; text-align: left; background: #1b2b3a; padding: 12px 13px; white-space: nowrap; }
+.xrank-table td { border-top: 1px solid #2b3b4d; padding: 9px 13px; font-size: 13px; }
+.xrank-table tbody tr:nth-child(even) { background: #182637; }
+.xrank-rank { font-weight: 760; font-variant-numeric: tabular-nums; }
+.xrank-xp { font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.xrank-weapon { white-space: nowrap; }
+.xrank-rule-icon { width: 26px; height: 26px; object-fit: contain; display: block; }
+.xrank-cards { display: none; }
+.xrank-card {
+    background: #162638;
+    border: 1px solid #304357;
+    border-radius: 9px;
+    padding: 10px 12px;
+}
+.xrank-card-top, .xrank-card-context, .xrank-card-figures {
+    display: flex;
+    align-items: center;
+}
+.xrank-card-top { justify-content: space-between; gap: 10px; }
+.xrank-card-context { gap: 9px; min-width: 0; }
+.xrank-card-figures { gap: 11px; flex-shrink: 0; font-size: 12px; }
+.xrank-card-rule { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: #b6c6d5; font-size: 12px; }
+.xrank-card-rule .xrank-rule-icon { width: 22px; height: 22px; }
+.xrank-card-weapon { margin-top: 4px; color: #a6bbce; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+    .xrank { margin: 42px auto 55px; }
+    .xrank-surface { padding: 16px; }
+    .xrank-search-results { grid-template-columns: 1fr; }
+    .xrank-player-head h3 { font-size: 18px; }
+    .xrank-table-wrap { display: none; }
+    .xrank-cards { display: grid; grid-template-columns: 1fr; gap: 9px; }
+    .xrank-ranking-head { align-items: flex-start; }
+    .xrank-filters { width: 100%; }
+    .xrank-filters select { flex: 1; min-width: 0; }
+}
+@media (max-width: 420px) {
+    .xrank-title-row h2 { font-size: 21px; }
+    .xrank-player-head { gap: 8px; }
+    .xrank-copy { padding: 8px; font-size: 11px; }
+    .xrank-filters select { font-size: 12px; padding: 8px 5px; }
+}

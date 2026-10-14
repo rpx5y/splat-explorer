@@ -1,20 +1,26 @@
 # splat-explorer
 
-Splatoon 3のデータを閲覧するためのWebツールです。
+A browser-based viewer for Splatoon 3 data and historical X Rank standings.
 
-## 機能
+## Features
 
-- JSONのツリー表示・検索・コピー
-- URL（GET）・ファイル・テキスト貼り付けからの読み込み
-- `.tar.zst` の展開、アーカイブ内JSONの一覧・検索・個別表示
-- SplatNetのBase64 IDのデコード
-- 日本語の文字化け補正（一部は復元できない場合があります）
+- View, search, and copy JSON in a tree.
+- Load JSON or `.tar.zst` archives from a URL or local file, or paste JSON directly.
+- Browse JSON files inside `.tar.zst` archives.
+- Decode Base64-encoded SplatNet IDs.
+- Repair some forms of garbled Japanese text.
+- Search X Rank players by ID or previously recorded names, view their final rankings, and inspect when each name appeared.
 
-## 利用
+## Data sources
 
-ブラウザでGitHub Pagesのサイトを開いて使用します。
-外部URLからの取得には、取得先サーバーのCORS許可が必要です。
+Historical X Rank records were obtained from [splatoon3.ink](https://splatoon3.ink) and processed into static JSON files. Weapon names are based on [Leanny/splat3](https://github.com/Leanny/splat3) and Nintendo's Japanese weapon names.
 
-## ライセンス
+This is an unofficial, independent project and is not affiliated with Nintendo, splatoon3.ink, or Leanny.
 
-MIT
+## Usage
+
+Open the GitHub Pages site in a browser. Loading data directly from other sites requires their servers to allow cross-origin requests (CORS).
+
+## License
+
+The project's source code is licensed under the MIT License. Third-party data and assets may have separate terms.
